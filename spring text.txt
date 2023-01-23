@@ -1,0 +1,157 @@
+ emp.java--->
+ 
+ package com.spring.spring;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+@Entity
+public class Emp {
+	private @Id 
+	@GeneratedValue int id;
+	private String name,email,phone,pass;
+	
+	public Emp() {
+		
+	}
+	
+	public Emp(String name,String email,String phone,String pass) {
+		this.name=name;
+		this.email=email;
+		this.phone=phone;
+		this.pass=pass;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	public String getPass() {
+		return pass;
+	}
+	public void setPass(String pass) {
+		this.pass = pass;
+	}
+	}
+
+
+empApplication---->
+package com.spring.spring;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RestController;
+
+@SpringBootApplication
+@RestController
+public class EmpApplication {
+
+	public static void main(String[] args) {
+				SpringApplication.run(EmpApplication.class,args);
+
+	}
+	
+
+}
+
+
+
+
+empinterrface--->
+package com.spring.spring;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+public interface EmpInterface extends JpaRepository <Emp, Integer> {
+}
+
+
+
+
+empCOntroller.java--->
+
+ package com.spring.spring;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+
+import org.springframework.web.bind.annotation.PathVariable;
+
+
+@RestController
+public class EmpController {
+	
+	
+	private EmpInterface repository;
+	public EmpController (EmpInterface repository) {
+		this.repository=repository;
+	}
+	@GetMapping("/emp")
+	List<Emp>get(){
+		return repository.findAll();
+
+	}
+	
+	@PostMapping("/emp")	
+	Emp save(@RequestBody Emp newEmp){
+		return repository.save(newEmp);
+}
+	@GetMapping("/emp/{id}")
+	Optional<Emp> getid(@PathVariable Integer id) {
+		return repository.findById(id);
+	}
+	@PutMapping("/emp/{id}")
+	Optional<Object> update(@PathVariable Integer id, @RequestBody Emp newEmp) {
+		return repository.findById(id).map(Emp->{
+			Emp.setPhone(newEmp.getPhone());
+			Emp.setPass(newEmp.getPass());
+			Emp updatedemployee = repository.save(Emp);
+			return updatedemployee;
+		});
+	}
+	
+	@DeleteMapping("/emp/{id}")
+	void delete (@PathVariable Integer id) {
+		repository.deleteById(id);
+	}
+}
+
+
+
+
+
+application properties--->
+
+
+spring.jpa.hibernate.ddl-auto=create
+spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/jdbc
+spring.datasource.username=root
+spring.datasource.password=
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
